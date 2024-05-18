@@ -15,7 +15,7 @@ const createGallery = asyncHandler(async (req, res) => {
 
     const gallery = await Gallery.create({
         galleryName,
-        members: req.user._id,
+        members: req.user?.username,
         createdBy: req.user?._id,
     });
 
