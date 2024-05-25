@@ -4,6 +4,7 @@ import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import generateTokens from '../utils/generateTokens.js';
+import jwt from 'jsonwebtoken';
 
 // * User registration
 const registerUser = asyncHandler(async (req, res) => {
@@ -99,6 +100,48 @@ const loginUser = asyncHandler(async (req, res) => {
         );
 });
 
+const refreshAccessToken = asyncHandler(async (req, res) => {
+    const incomingRefreshToken = req.cookies?.refreshTokens;
+    if (!incomingRefreshToken) {
+        throw new ApiError(401, 'Unauthorized access');
+    }
+    try {
+        const decodedToken = jwt.verify(
+            incomingRefreshToken,
+            process.env.REFRESH_TOKEN_SECRET
+        );
+        const user = await User.findById(decodedToken?._id);
+        if (!user) {
+            throw new ApiError(404, 'Invalid refresh token');
+        }
+
+        if (user?.refreshTokens !== incomingRefreshToken) {
+            throw new ApiError(403, 'Refresh token invalid');
+        }
+
+        const options = {
+            httpOnly: true,
+            // secure: true
+        };
+
+        const { accessTokens, refreshTokens } = await generateTokens(user._id);
+
+        return res
+            .status(200)
+            .cookie('accessTokens', accessTokens, options)
+            .cookie('refreshTokens', refreshTokens, options)
+            .json(
+                new ApiResponse(
+                    200,
+                    { refreshTokens },
+                    'Access Tokens refreshed'
+                )
+            );
+    } catch (error) {
+        throw new ApiError(500, 'Failed to refresh tokens');
+    }
+});
+
 // * Logout User
 const logoutUser = asyncHandler(async (req, res) => {
     await User.findByIdAndUpdate(
@@ -134,7 +177,7 @@ const getUser = asyncHandler(async (req, res) => {
         {
             $lookup: {
                 from: 'media',
-                localField: '_id',
+                localField: 'username',
                 foreignField: 'uploadedBy',
                 as: 'uploads',
             },
@@ -178,7 +221,7 @@ const getUserbyId = asyncHandler(async (req, res) => {
         {
             $lookup: {
                 from: 'media',
-                localField: '_id',
+                localField: 'username',
                 foreignField: 'uploadedBy',
                 as: 'uploads',
             },
@@ -224,4 +267,5 @@ export {
     getUser,
     getUserbyId,
     userStatus,
+    refreshAccessToken,
 };

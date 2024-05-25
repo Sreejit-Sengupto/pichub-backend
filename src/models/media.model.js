@@ -18,8 +18,7 @@ const mediaSchema = new Schema(
             required: true,
         },
         uploadedBy: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
+            type: String,
         },
         belongsToGallery: [
             {

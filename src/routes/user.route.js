@@ -4,6 +4,7 @@ import {
     getUserbyId,
     loginUser,
     logoutUser,
+    refreshAccessToken,
     registerUser,
     userStatus,
 } from '../controller/user.controller.js';
@@ -13,6 +14,7 @@ const router = Router();
 
 router.route('/register').post(registerUser);
 router.route('/login').post(loginUser);
+router.route('/refresh-tokens').post(refreshAccessToken);
 
 //! Secure Route
 router.route('/status').get(verifyJWT, userStatus);

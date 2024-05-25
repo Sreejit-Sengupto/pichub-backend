@@ -68,7 +68,7 @@ const addMembers = asyncHandler(async (req, res) => {
     const addedMembers = await Gallery.findById(
         new mongoose.Types.ObjectId(galleryId)
     );
-    if (!addMembers) {
+    if (!addedMembers) {
         throw new ApiError(500, 'Failed to add members');
     }
 

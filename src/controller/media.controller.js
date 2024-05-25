@@ -34,7 +34,7 @@ const uploadMedia = asyncHandler(async (req, res) => {
         mediaURL: uploadedMedia?.secure_url || ' ',
         resourceType: uploadedMedia?.resource_type,
         cloudinaryPublicId: uploadedMedia?.public_id,
-        uploadedBy: req.user?._id,
+        uploadedBy: req.user?.username,
     });
 
     if (!media) {
@@ -136,7 +136,7 @@ const deleteMedia = asyncHandler(async (req, res) => {
     if (!media) {
         throw new ApiError(404, 'No media was found with the following id');
     }
-    if (!media.uploadedBy.equals(req.user?._id)) {
+    if (media.uploadedBy !== req.user?.username) {
         throw new ApiError(403, "You cannot delete someone else's media");
     }
 
