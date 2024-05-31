@@ -87,6 +87,7 @@ const loginUser = asyncHandler(async (req, res) => {
         secure: true,
         sameSite: 'None',
         domain: 'https://pichub-app.vercel.app',
+        path: '/',
     };
 
     return res
@@ -126,6 +127,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             secure: true,
             sameSite: 'None',
             domain: 'https://pichub-app.vercel.app',
+            path: '/',
         };
 
         const { accessTokens, refreshTokens } = await generateTokens(user._id);
@@ -163,6 +165,7 @@ const logoutUser = asyncHandler(async (req, res) => {
         secure: true,
         sameSite: 'None',
         domain: 'https://pichub-app.vercel.app',
+        path: '/',
     };
 
     return res
